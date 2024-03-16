@@ -1,8 +1,8 @@
 import { Route, Routes } from "react-router-dom"
 import { Inicio } from "../views/Inicio"; 
-import { RolesView } from "../Roles/views/RolesView";
-import { EmpleadosView } from "../Empleados/views/EmpleadosView";
-import { MovimientosView } from "../Movimientos/views/MovimientosView";
+import { RolesView } from "../views/RolesView";
+import { EmpleadosView } from "../views/EmpleadosView";
+import { MovimientosView } from "../views/MovimientosView";
 import { NavBar } from "../components/NavBar";
 
     
