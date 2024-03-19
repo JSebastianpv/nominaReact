@@ -6,6 +6,7 @@ import { NominaApp } from './NominaApp';
 import 'jquery';
 import 'datatables.net';
 
+
 ReactDOM.createRoot(document.getElementById('root')).render(
   // <React.StrictMode>
     <BrowserRouter>

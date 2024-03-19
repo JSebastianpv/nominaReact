@@ -18,12 +18,12 @@ export const NavBar = () => {
                 <div className="collapse navbar-collapse" id="navbarNav">
                 <ul className="navbar-nav">
                     <li className="nav-item">
-                        <NavLink 
+                        {/* <NavLink 
                             className="nav-item nav-link" 
                             to="/movimientos"
                         >
                             Movimientos
-                        </NavLink>
+                        </NavLink> */}
                     </li>
                     <li className="nav-item">
                         <NavLink 

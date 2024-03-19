@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { DatatableEmpleados } from '../components/DatatableEmpleados';
-import { getEmp, postEmp, getRoles } from '../helpers/Peticiones';
+import { getEmp, postEmp, getRoles, getIdEmp, putEmp } from '../helpers/Peticiones';
 import Swal from 'sweetalert2';
+import { cerrarModal } from '../helpers/Funciones';
 
 export const EmpleadosView = () => {
     const [empleados, setEmpleados] = useState([]);
@@ -9,7 +10,9 @@ export const EmpleadosView = () => {
     const [nombre, setNombre] = useState('');
     const [apellidos, setApellidos] = useState('');
     const [nEmpleado, setNEmpleado] = useState('');
+    const [encModal, setEncModal] = useState('Nuevo Empleado');
     const [selRol, setSelRol] = useState(0);
+    const [empId, setEmpId] = useState(0);
 
     const getEmpleados = async () => {
         const newEmp = await getEmp();
@@ -29,14 +32,31 @@ export const EmpleadosView = () => {
         }
     }
 
+    const handleEditar = async (idEmp) => {
+        const empRes = await getIdEmp(idEmp);
+
+        setEncModal('Editar Empleado');
+        setEmpId(empRes[0].id);
+        setNombre(empRes[0].nombre);
+        setNEmpleado(empRes[0].no_empleado);
+        setApellidos(empRes[0].apellido);
+        setSelRol(empRes[0].rol.id);
+    };
+
+    const limpiaState = () => {
+        setEncModal('Nuevo Empleado');
+        setNombre('');
+        setNEmpleado('');
+        setApellidos('');
+        setSelRol(0);
+    }
+
     useEffect( () => {
         getEmpleados();
         
     }, []);
 
-    const cerrarModal = () => {
-        document.querySelector('.btn-close').click();
-    };
+    
 
     const onSubmit = async (event) => {
         event.preventDefault();
@@ -49,7 +69,14 @@ export const EmpleadosView = () => {
             });
             return;
         }
-        const resp = await postEmp(nombre, apellidos, nEmpleado, selRol);
+
+        var resp;
+        if (empId == 0) {
+            resp = await postEmp(nombre, apellidos, nEmpleado, selRol);
+        } else {
+            resp = await putEmp(empId, nombre, apellidos, nEmpleado, selRol);
+        }
+        
         if (resp.status != 200) {
             Swal.fire({
                 position: "center",
@@ -65,12 +92,11 @@ export const EmpleadosView = () => {
                 showConfirmButton: false,
                 timer: 1500
               });
-            setNombre('');
-            setNEmpleado('');
-            setApellidos('');
-            setSelRol(0);
+            limpiaState();
             getEmpleados();
+
             cerrarModal();
+
         }
 
     }
@@ -79,33 +105,33 @@ export const EmpleadosView = () => {
             <h2>Listado de Empleados</h2>
             <div>
 
-                <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevo">
-                    Nuevo
+                <button type="button" className="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNuevo" onClick={() => limpiaState()}>
+                    <i className="fa-solid fa-plus"></i>
                 </button>
 
                 <div className="modal fade" id="modalNuevo"  aria-labelledby="modalNuevoLabel" aria-hidden="true" >
                     <div className="modal-dialog">
                         <div className="modal-content">
                             <div className="modal-header">
-                                <h1 className="modal-title fs-5" id="modalNuevoLabel">Nuevo Empleado</h1>
+                                <h1 className="modal-title fs-5" id="modalNuevoLabel">{encModal}</h1>
                                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
                             <div className="modal-body">
                                 <form onSubmit={(event) => onSubmit(event)}>
                                     <div className="mb-3">
                                         <label className="form-label">Nombre</label>
-                                        <input type="text" className="form-control"  placeholder="Nombre del empleado" value={nombre} onChange={e => setNombre(e.target.value)} required/>
+                                        <input type="text" className="form-control" maxLength={25}  placeholder="Nombre del empleado" value={nombre} onChange={e => setNombre(e.target.value)} />
                                     </div>
                                     <div className="mb-3">
                                         <label className="form-label">Apellido</label>
-                                        <input type="text" className="form-control"  placeholder="Apellidos del empleado" value={apellidos} onChange={e => setApellidos(e.target.value)}/>
+                                        <input type="text" className="form-control" maxLength={25}   placeholder="Apellidos del empleado" value={apellidos} onChange={e => setApellidos(e.target.value)}/>
                                     </div>
                                     <div className="mb-3">
-                                        <label className="form-label">Numero de empleado</label>
-                                        <input type="text" className="form-control"  placeholder="Numero de empleado" value={nEmpleado} onChange={onChangeNoEmpleado}/>
+                                        <label className="form-label">Número de empleado</label>
+                                        <input type="text" className="form-control" maxLength={6}   placeholder="Número de empleado" value={nEmpleado} onChange={onChangeNoEmpleado}/>
                                     </div>
                                     <div className="col-md-4">
-                                        <label  className="form-label">Selecciona rol</label>
+                                        <label  className="form-label">Seleccione rol</label>
                                         <select  className="form-select" value={selRol} onChange={e => setSelRol(e.target.value)}>
                                             <option value="0">Seleccione</option>
                                             {roles.map((rol, index) => (
@@ -120,14 +146,14 @@ export const EmpleadosView = () => {
                                 
                             </div>
                             <div className="modal-footer">
-                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                                 <button type="button" className="btn btn-primary" onClick={onSubmit}>Guardar</button>
                             </div>
                         </div>
                     </div>
                 </div>
                 
-                <DatatableEmpleados datos={empleados} />
+                <DatatableEmpleados datos={empleados} onClickEditar={handleEditar} />
             </div>
         </div>
     )
