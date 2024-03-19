@@ -1,7 +1,7 @@
 import axios from 'axios';
 import Swal from 'sweetalert2';
 
-const urlBase = 'http://localhost:8080/nom';
+const urlBase = 'https://30bpnhlb-8080.usw3.devtunnels.ms/nom';
 
 export const getRoles = async () => {
     try {

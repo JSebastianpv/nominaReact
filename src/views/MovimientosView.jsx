@@ -21,9 +21,11 @@ export const MovimientosView = () => {
 
     
     
-    const getMov = async (sMes) => {
-        const newMovtos = await getMovtosMes(sMes);
-        setMovtos(newMovtos);
+    const getMov = async(sMes) => {
+            const newMovtos = await getMovtosMes(sMes);
+            setTimeout(() => {
+                setMovtos(newMovtos);
+            }, 100);
     }
 
     const onChangeNoEmpleado = ({target}) => {
